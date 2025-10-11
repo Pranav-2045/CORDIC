@@ -143,31 +143,52 @@ The testbench is self-checking and will print the results of each test to the co
 
 -----------------------------------------------------
 Testing angle: 0.000000 degrees
-Scaled input angle:           0
-DUT Output (int): cos=       9950, sin=          0
-DUT Output (real): cos=0.607300, sin=0.000000
+Scaled input angle:      0
+DUT Output (int): cos= 16385, sin=    -2
+DUT Output (real): cos=1.000061, sin=-0.000122
 Expected   (real): cos=1.000000, sin=0.000000
 
 -----------------------------------------------------
 Testing angle: 30.000000 degrees
-Scaled input angle:        5461
-DUT Output (int): cos=       8615, sin=       4972
-DUT Output (real): cos=0.525818, sin=0.303467
+Scaled input angle:   5461
+DUT Output (int): cos= 14193, sin=  8192
+DUT Output (real): cos=0.866272, sin=0.500000
 Expected   (real): cos=0.866025, sin=0.500000
 
 -----------------------------------------------------
 Testing angle: 45.000000 degrees
-Scaled input angle:        8192
-DUT Output (int): cos=       6999, sin=       7008
-DUT Output (real): cos=0.427185, sin=0.427734
+Scaled input angle:   8192
+DUT Output (int): cos= 11587, sin= 11586
+DUT Output (real): cos=0.707214, sin=0.707153
 Expected   (real): cos=0.707107, sin=0.707107
 
 -----------------------------------------------------
+Testing angle: 60.000000 degrees
+Scaled input angle:  10923
+DUT Output (int): cos=  8190, sin= 14193
+DUT Output (real): cos=0.499878, sin=0.866272
+Expected   (real): cos=0.500000, sin=0.866025
+
+-----------------------------------------------------
 Testing angle: 90.000000 degrees
-Scaled input angle:       16384
-DUT Output (int): cos=         -3, sin=       9948
-DUT Output (real): cos=-0.000183, sin=0.607178
+Scaled input angle:  16384
+DUT Output (int): cos=    -4, sin= 16385
+DUT Output (real): cos=-0.000244, sin=1.000061
 Expected   (real): cos=0.000000, sin=1.000000
+
+-----------------------------------------------------
+Testing angle: -30.000000 degrees
+Scaled input angle:  -5461
+DUT Output (int): cos= 14193, sin= -8190
+DUT Output (real): cos=0.866272, sin=-0.499878
+Expected   (real): cos=0.866025, sin=-0.500000
+
+-----------------------------------------------------
+Testing angle: -90.000000 degrees
+Scaled input angle: -16384
+DUT Output (int): cos=    -6, sin=-16385
+DUT Output (real): cos=-0.000366, sin=-1.000061
+Expected   (real): cos=0.000000, sin=-1.000000
 
 ================== CORDIC TEST END ==================
 ```
