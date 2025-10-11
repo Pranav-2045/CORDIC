@@ -136,7 +136,7 @@ Ensure you have [Icarus Verilog](https://www.google.com/search?q=http://iverilog
 
 #### Expected Output
 
-The testbench is self-checking and will print the results of each test to the console. The output shows the DUT's raw integer and scaled floating-point values alongside the mathematically expected sine/cosine values. Note the gain difference as explained above.
+The testbench is self-checking and will print the results of each test to the console. The output shows the DUT's raw integer and scaled fixed-point values alongside the mathematically expected sine/cosine values. Note the gain difference as explained above.
 
 ```
 ================== CORDIC TEST START ==================
