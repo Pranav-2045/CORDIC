@@ -88,7 +88,7 @@ The testbench (`tb_cordic.v`) handles this conversion automatically.
 ### An Important Note on Gain
 
 The series of micro-rotations in the CORDIC algorithm scales the magnitude of the initial vector by a constant gain factor, $K$. After $N$ iterations, this gain is:
-$$ K = \prod_{i=0}^{N-1} \sqrt{1 + 2^{-2i}} $$
+The scale factor is defined as $K = \prod_{i=0}^{N-1} \sqrt{1 + 2^{-2i}}$ for the algorithm.
 For a large number of iterations ($N=16$ in this case), this gain converges to approximately **1.64676**.
 
 This implementation starts with an initial vector of `(x=1, y=0)`. Therefore, the final outputs are not $(\cos\theta, \sin\theta)$ but rather $(K \cdot \cos\theta, K \cdot \sin\theta)$. To get the true sine and cosine values, you must correct for this gain by either:
