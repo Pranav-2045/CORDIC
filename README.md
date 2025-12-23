@@ -2,7 +2,7 @@
 
 # Pipelined CORDIC Engine in Verilog
 
-This repository contains a synthesizable, **16-bit, 16-stage pipelined CORDIC** (COordinate Rotation DIgital Computer) engine written in Verilog. It's designed to calculate the sine and cosine of a given input angle with high throughput, making it ideal for applications in Digital Signal Processing (DSP), communications, and real-time control systems.
+This repository contains a synthesizable, **16-bit, 16-stage pipelined CORDIC** (Coordinate Rotation Digital Computer) engine written in Verilog. It's designed to calculate the sine and cosine of a given input angle with high throughput, making it ideal for applications in Digital Signal Processing (DSP), communications, and real-time control systems.
 
 The primary advantage of the CORDIC algorithm is its ability to compute trigonometric functions using only simple hardware components: **adders, subtractors, and bit-shifters**. It completely avoids the need for complex and resource-intensive multipliers.
 
