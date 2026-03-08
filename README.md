@@ -105,6 +105,7 @@ The testbench output reflects this uncorrected gain. For an input of 0°, the ex
 .
 ├── cordic.v         # The synthesizable CORDIC core module.
 └── tb_cordic.v      # The testbench for simulating and verifying the core.
+└── schematics.md    # Architectural diagrams and datapath schematics.
 ```
 
 -----
