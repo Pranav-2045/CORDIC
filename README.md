@@ -192,3 +192,4 @@ Expected   (real): cos=0.000000, sin=-1.000000
 
 ================== PIPELINED CORDIC TEST END ==================
 ```
+<img width="1919" height="759" alt="image" src="https://github.com/user-attachments/assets/e337b1fa-e69b-4c82-860a-716fd0bcc074" />
