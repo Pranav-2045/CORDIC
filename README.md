@@ -34,7 +34,7 @@ Where:
 
 ## ✨ Features
 
-  * **Pipelined Architecture**: A 16-stage pipeline allows it to accept a new angle on every clock cycle after an initial latency. This results in a very high throughput of **1 result/cycle**.
+  * **Pipelined Architecture**: A fully unrolled 16-stage pipeline allows it to accept a new angle on every clock cycle after an initial 16-cycle latency. This results in a very high throughput of **1 result/cycle** with no FSM bottlenecks.
   * **Multiplier-less Design**: True to the CORDIC algorithm, the datapath contains **no hardware multipliers**, saving significant hardware resources.
   * **Fixed-Point Arithmetic**: Uses a 16-bit signed **Q2.14** fixed-point format for all calculations, providing a good balance between precision and hardware cost.
   * **High Throughput**: Ideal for streaming data applications in DSP and software-defined radio (SDR).
@@ -48,8 +48,7 @@ Where:
 The module is composed of three main parts:
 
 1.  **Angle Look-Up Table (LUT)**: A small, hardcoded ROM that stores the pre-calculated $\arctan(2^{-i})$ constants required for each iteration.
-2.  **Control Logic**: Manages the flow of data through the pipeline, handling start/done signaling.
-3.  **Pipelined Datapath**: This is the core of the engine. It consists of 16 physical stages, where each stage contains:
+2.  **Pipelined Datapath**: This is the core of the engine. It consists of 16 physical stages, where each stage contains:
       * Two barrel shifters (for the $\cdot 2^{-i}$ operation).
       * Three adders/subtractors (to calculate the next $x, y,$ and $z$).
       * Pipeline registers to hold the results between stages.
@@ -125,14 +124,14 @@ Ensure you have [Icarus Verilog](https://www.google.com/search?q=http://iverilog
     Open your terminal in the project directory and run the compilation command:
 
     ```sh
-    iverilog -o tb_cordic cordic.v tb_cordic.v
+    iverilog -o cordic_tb.vvp cordic.v tb_cordic.v
     ```
 
 2.  **Run the simulation:**
     Execute the compiled design:
 
     ```sh
-    vvp tb_cordic
+    vvp cordic_tb.vvp
     ```
 
 #### Expected Output
@@ -140,56 +139,56 @@ Ensure you have [Icarus Verilog](https://www.google.com/search?q=http://iverilog
 The testbench is self-checking and will print the results of each test to the console. The output shows the DUT's raw integer and scaled fixed-point values alongside the mathematically expected sine/cosine values. Note the gain difference as explained above.
 
 ```
-================== CORDIC TEST START ==================
+================== PIPELINED CORDIC TEST START ==================
 
 -----------------------------------------------------
-Testing angle: 0.000000 degrees
-Scaled input angle:      0
+Received output for angle index:           0
+Angle tested: 0.000000 degrees
 DUT Output (int): cos= 16385, sin=    -2
 DUT Output (real): cos=1.000061, sin=-0.000122
 Expected   (real): cos=1.000000, sin=0.000000
 
 -----------------------------------------------------
-Testing angle: 30.000000 degrees
-Scaled input angle:   5461
+Received output for angle index:           1
+Angle tested: 30.000000 degrees
 DUT Output (int): cos= 14193, sin=  8192
 DUT Output (real): cos=0.866272, sin=0.500000
 Expected   (real): cos=0.866025, sin=0.500000
 
 -----------------------------------------------------
-Testing angle: 45.000000 degrees
-Scaled input angle:   8192
+Received output for angle index:           2
+Angle tested: 45.000000 degrees
 DUT Output (int): cos= 11587, sin= 11586
 DUT Output (real): cos=0.707214, sin=0.707153
 Expected   (real): cos=0.707107, sin=0.707107
 
 -----------------------------------------------------
-Testing angle: 60.000000 degrees
-Scaled input angle:  10923
+Received output for angle index:           3
+Angle tested: 60.000000 degrees
 DUT Output (int): cos=  8190, sin= 14193
 DUT Output (real): cos=0.499878, sin=0.866272
 Expected   (real): cos=0.500000, sin=0.866025
 
 -----------------------------------------------------
-Testing angle: 90.000000 degrees
-Scaled input angle:  16384
+Received output for angle index:           4
+Angle tested: 90.000000 degrees
 DUT Output (int): cos=    -4, sin= 16385
 DUT Output (real): cos=-0.000244, sin=1.000061
 Expected   (real): cos=0.000000, sin=1.000000
 
 -----------------------------------------------------
-Testing angle: -30.000000 degrees
-Scaled input angle:  -5461
+Received output for angle index:           5
+Angle tested: -30.000000 degrees
 DUT Output (int): cos= 14193, sin= -8190
 DUT Output (real): cos=0.866272, sin=-0.499878
 Expected   (real): cos=0.866025, sin=-0.500000
 
 -----------------------------------------------------
-Testing angle: -90.000000 degrees
-Scaled input angle: -16384
+Received output for angle index:           6
+Angle tested: -90.000000 degrees
 DUT Output (int): cos=    -6, sin=-16385
 DUT Output (real): cos=-0.000366, sin=-1.000061
 Expected   (real): cos=0.000000, sin=-1.000000
 
-================== CORDIC TEST END ==================
+================== PIPELINED CORDIC TEST END ==================
 ```
