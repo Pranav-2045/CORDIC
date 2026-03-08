@@ -35,12 +35,12 @@ module cordic #(
 ) (
     input                       clk,
     input                       rst_n,
-    input                       start,      // Start computation signal
+    input                       valid_in,   // Data valid input
     input      signed [DATA_WIDTH-1:0] angle_in,   // Input angle in scaled format
 
     output reg signed [DATA_WIDTH-1:0] x_out,      // cos(angle_in)
     output reg signed [DATA_WIDTH-1:0] y_out,      // sin(angle_in)
-    output reg                  done        // Computation finished
+    output reg                  valid_out   // Data valid output
 );
 
     //--------------------------------------------------------------------------
@@ -75,37 +75,10 @@ module cordic #(
     reg signed [DATA_WIDTH-1:0] x_pipe [0:ITERATIONS];
     reg signed [DATA_WIDTH-1:0] y_pipe [0:ITERATIONS];
     reg signed [DATA_WIDTH-1:0] z_pipe [0:ITERATIONS];
+    reg valid_pipe [0:ITERATIONS];
 
     //--------------------------------------------------------------------------
-    // 3. State Machine for control
-    //--------------------------------------------------------------------------
-    localparam S_IDLE    = 2'b00;
-    localparam S_COMPUTE = 2'b01;
-    localparam S_DONE    = 2'b10;
-
-    reg [1:0] state, next_state;
-    reg [4:0] iteration_counter; // Counter for pipeline stages
-
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            state <= S_IDLE;
-        end else begin
-            state <= next_state;
-        end
-    end
-
-    // State transition logic
-    always @(*) begin
-        next_state = state;
-        case(state)
-            S_IDLE: if (start) next_state = S_COMPUTE;
-            S_COMPUTE: if (iteration_counter == ITERATIONS) next_state = S_DONE;
-            S_DONE: if (!start) next_state = S_IDLE; // Wait for start to go low before restarting
-        endcase
-    end
-    
-    //--------------------------------------------------------------------------
-    // 4. Datapath and Pipeline Logic
+    // 3. Datapath and Pipeline Logic
     //--------------------------------------------------------------------------
     integer i;
 
@@ -116,52 +89,46 @@ module cordic #(
                 x_pipe[i] <= 0;
                 y_pipe[i] <= 0;
                 z_pipe[i] <= 0;
+                valid_pipe[i] <= 0;
             end
             x_out <= 0;
             y_out <= 0;
-            done <= 0;
-            iteration_counter <= 0;
+            valid_out <= 0;
         end else begin
-            case(state)
-                S_IDLE: begin
-                    done <= 0;
-                    iteration_counter <= 0;
-                    // When 'start' is asserted, load initial values into the first stage
-                    if (start) begin
-                        x_pipe[0] <= 16'd9950;  // Initial X = 1/K (0.60725) in Q2.14
-                        y_pipe[0] <= 16'd0;     // Initial Y = 0
-                        z_pipe[0] <= angle_in;  // Load the target angle
-                    end
-                end
+            // Pipeline Stage 0: Input capture
+            valid_pipe[0] <= valid_in;
+            if (valid_in) begin
+                x_pipe[0] <= 16'd9950;  // Initial X = 1/K (0.60725) in Q2.14
+                y_pipe[0] <= 16'd0;     // Initial Y = 0
+                z_pipe[0] <= angle_in;  // Load the target angle
+            end else begin
+                // Optional: clear or keep data when invalid. Keeping is fine.
+            end
 
-                S_COMPUTE: begin
-                    // This loop describes the connections between pipeline stages.
-                    // It generates a chain of adders/subtractors and shifters.
-                    for (i=0; i<ITERATIONS; i=i+1) begin
-                        // Determine rotation direction based on the sign of z
-                        // If z is negative, we need to rotate clockwise (+).
-                        // If z is positive, we need to rotate counter-clockwise (-).
-                        if (z_pipe[i][DATA_WIDTH-1]) begin // z is negative
-                            x_pipe[i+1] <= x_pipe[i] + (y_pipe[i] >>> i);
-                            y_pipe[i+1] <= y_pipe[i] - (x_pipe[i] >>> i);
-                            z_pipe[i+1] <= z_pipe[i] + angle_lut[i];
-                        end else begin // z is positive or zero
-                            x_pipe[i+1] <= x_pipe[i] - (y_pipe[i] >>> i);
-                            y_pipe[i+1] <= y_pipe[i] + (x_pipe[i] >>> i);
-                            z_pipe[i+1] <= z_pipe[i] - angle_lut[i];
-                        end
-                    end
-                    iteration_counter <= iteration_counter + 1;
-                end
+            // Pipeline Stages 1 to ITERATIONS
+            for (i=0; i<ITERATIONS; i=i+1) begin
+                valid_pipe[i+1] <= valid_pipe[i]; // Propagate the valid signal
                 
-                S_DONE: begin
-                    // Computation is finished. Hold the final values.
-                    x_out <= x_pipe[ITERATIONS]; // Cosine result
-                    y_out <= y_pipe[ITERATIONS]; // Sine result
-                    done <= 1;
-                    iteration_counter <= 0; // Reset for next run
+                // Only compute if valid data is present to save switching power, 
+                // though strictly not necessary for functionality.
+                if (valid_pipe[i]) begin
+                    // Determine rotation direction based on the sign of z
+                    if (z_pipe[i][DATA_WIDTH-1]) begin // z is negative
+                        x_pipe[i+1] <= x_pipe[i] + (y_pipe[i] >>> i);
+                        y_pipe[i+1] <= y_pipe[i] - (x_pipe[i] >>> i);
+                        z_pipe[i+1] <= z_pipe[i] + angle_lut[i];
+                    end else begin // z is positive or zero
+                        x_pipe[i+1] <= x_pipe[i] - (y_pipe[i] >>> i);
+                        y_pipe[i+1] <= y_pipe[i] + (x_pipe[i] >>> i);
+                        z_pipe[i+1] <= z_pipe[i] - angle_lut[i];
+                    end
                 end
-            endcase
+            end
+            
+            // Output Registration
+            x_out <= x_pipe[ITERATIONS]; // Cosine result
+            y_out <= y_pipe[ITERATIONS]; // Sine result
+            valid_out <= valid_pipe[ITERATIONS];
         end
     end
 endmodule
