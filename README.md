@@ -112,8 +112,7 @@ The testbench output reflects this uncorrected gain. For an input of 0°, the ex
 
 ## 🚀 How to Run Simulation
 
-I had done it using Xilinx Vivado,
-But You can simulate this project using open-source tools like Icarus Verilog and view the waveforms with GTKWave.
+You can simulate this project using open-source tools like Icarus Verilog and view the waveforms with GTKWave.
 
 #### Prerequisites
 
