@@ -49,7 +49,7 @@ The module is composed of three main parts:
 
 1.  **Angle Look-Up Table (LUT)**: A small, hardcoded ROM that stores the pre-calculated $\arctan(2^{-i})$ constants required for each iteration.
 2.  **Pipelined Datapath**: This is the core of the engine. It consists of 16 physical stages, where each stage contains:
-      * Two barrel shifters (for the $\cdot 2^{-i}$ operation).
+      * Two shifters (for the $\cdot 2^{-i}$ operation).
       * Three adders/subtractors (to calculate the next $x, y,$ and $z$).
       * Pipeline registers to hold the results between stages.
 
